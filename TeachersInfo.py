@@ -9,6 +9,7 @@ import requests
 import re
 import pytesseract
 import io
+import OCRFunction
 
 
 def work():
@@ -138,8 +139,8 @@ def work():
                             if response.status_code == 200:
                                 imageData = BytesIO(response.content)
                                 image = Image.open(imageData)
-                                text = pytesseract.image_to_string(image)
-
+                                #text = pytesseract.image_to_string(image)
+                                text = OCRFunction.image2string(image)
 
 
                                 strLine = strLine.replace("邮箱：","邮箱："+text).replace("Email：","Email："+text)
@@ -164,7 +165,8 @@ def work():
                             if response.status_code == 200:
                                 imageData = BytesIO(response.content)
                                 image = Image.open(imageData)
-                                text = pytesseract.image_to_string(image)
+                                #text = pytesseract.image_to_string(image)
+                                text = OCRFunction.image2string(image)
                                 strLine = strLine.replace("电话：","电话："+text)
 
 
