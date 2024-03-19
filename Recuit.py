@@ -5,87 +5,96 @@ import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-url = 'https://ccst.jlu.edu.cn/gny.htm'
-pagexpath = '/html/body/div[3]/div[2]/div[2]/div[1]/span[1]'
-patternDrop = re.compile(r'<p[^>]*>|<\/p>|<br>|<br[^>]*>|&nbsp;|<span[^>]*>|'
-                         r'</span>|<li[^>]*>|</li>|<ol[^>]*>|<\/ol>|<strong[^>]*>|'
-                         r'</strong>|<ul[^>]*>|<\/ul>|<h1[^>]*>|</h1>|<td[^>]*>|</td>|'
-                         r'<div[^>]*>|</div>|</form>|<h2[^>]*>|</h2>|<tbody>|<table>|<a[^>]*>|</a>|</tbody>|</table>|\n|\xa0')
 
-patternStrong = re.compile(r'<strong[^>]*>',re.S)
-resp = requests.get(url)
-html = etree.HTML(resp.content)
-divs = html.xpath(pagexpath)
-prelog = 'https://ccst.jlu.edu.cn'
-for div in divs:
-    rows = div.text[1:-1]
+def work():
+    titlexpath = '/html/head/title[1]'
+    dics = []
+    url = 'https://ccst.jlu.edu.cn/gny.htm'
+    pagexpath = '/html/body/div[3]/div[2]/div[2]/div[1]/span[1]'
+    patternDrop = re.compile(r'<p[^>]*>|<\/p>|<br>|<br[^>]*>|&nbsp;|<span[^>]*>|'
+                             r'</span>|<li[^>]*>|</li>|<ol[^>]*>|<\/ol>|<strong[^>]*>|'
+                             r'</strong>|<ul[^>]*>|<\/ul>|<h1[^>]*>|</h1>|<td[^>]*>|</td>|'
+                             r'<div[^>]*>|</div>|</form>|<h2[^>]*>|</h2>|<tbody>|<table>|<a[^>]*>|</a>|</tbody>|</table>|\n|\xa0')
 
-pages = math.ceil(int(rows)/10)
-curpages = pages
-dics = []
-titlexpath = '/html/head/title[1]'
-while curpages != 0:
-    content = []
-    dict = {
-        'url': [],
-        'title': [],
-        'content': [],
-        'date': []
-    }
-    i = 1
-    # 去取动态html转换为静态
-    browser = webdriver.Edge()
-    if curpages == pages:  # 说明当前在众多页中的第一页，则url不需要改变
-        browser.get(url)
-        curpages -= 1
-    else:  # url需要改变
-        url = url[:-4] + '/' + str(curpages) + url[-4:]
-        curpages -= 1
-        browser.get(url)
+    patternStrong = re.compile(r'<strong[^>]*>', re.S)
+    resp = requests.get(url)
+    html = etree.HTML(resp.content)
+    titles = html.xpath(titlexpath)
+    for es in titles:
+        title = es.text
+    dict['url'] = url
+    dict['title'] = title
+    dics.append(dict)
+    divs = html.xpath(pagexpath)
+    prelog = 'https://ccst.jlu.edu.cn'
+    for div in divs:
+        rows = div.text[1:-1]
 
-    htmlStr = browser.page_source
-    # print(htmlStr)  # 将第t页的动态码转换为静态字串
-    browser.close()
-    html = etree.HTML(htmlStr)  # 把静态字串转换为HTML
+    pages = math.ceil(int(rows) / 10)
+    curpages = pages
 
-    # 下面开始获取li
-    i = 1
-    while i != 11:
-        rowxpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/a[1]'  # 获取连接用的xpath
-        divs = html.xpath(rowxpath)  # 对HTML进行xpath解析（这一页包含很多li）
-        for div in divs:
-            content = []
-            newUrl = prelog + '/'+div.get('href')
-            # print(newUrl)
-            # 下面对这个newUrl进行访问，并获取文章内容
-            resp2 = requests.get(newUrl)
-            resp2_headers = resp2.headers
-            lastmodify = resp2_headers.get('Last-Modified')
-            html2 = etree.HTML(resp2.content)
-            titles = html2.xpath(titlexpath)
-            for e in titles:
-                title = e.text  # 获取标题
+    while curpages != 0:
+        content = []
+        dict = {
+            'url': [],
+            'title': [],
+            'content': [],
+            'date': []
+        }
+        i = 1
+        # 去取动态html转换为静态
+        browser = webdriver.Edge()
+        if curpages == pages:  # 说明当前在众多页中的第一页，则url不需要改变
+            browser.get(url)
+            curpages -= 1
+        else:  # url需要改变
+            url = url[:-4] + '/' + str(curpages) + url[-4:]
+            curpages -= 1
+            browser.get(url)
 
-            soup = BeautifulSoup(resp2.content, 'html.parser')
+        htmlStr = browser.page_source
+        browser.close()
+        html = etree.HTML(htmlStr)  # 把静态字串转换为HTML
 
-            # 找到id为vsb_content的div标签
-            vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
+        # 下面开始获取li
+        i = 1
+        while i != 11:
+            rowxpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/a[1]'  # 获取连接用的xpath
+            divs = html.xpath(rowxpath)  # 对HTML进行xpath解析（这一页包含很多li）
+            for div in divs:
+                content = []
+                newUrl = prelog + '/' + div.get('href')
+                # print(newUrl)
+                # 下面对这个newUrl进行访问，并获取文章内容
+                resp2 = requests.get(newUrl)
+                resp2_headers = resp2.headers
+                lastmodify = resp2_headers.get('Last-Modified')
+                html2 = etree.HTML(resp2.content)
+                titles = html2.xpath(titlexpath)
+                for e in titles:
+                    title = e.text  # 获取标题
 
-            # 获取该div内部的所有内容（包括标签）的字符串表示
-            inner_content = str(vsb_content_div)
-            inner_content = patternDrop.sub('', inner_content)
-            subStrings = inner_content.split('</p>')
+                soup = BeautifulSoup(resp2.content, 'html.parser')
 
-            for it in subStrings:
-                patternDrop.sub('', it)
-                patternStrong.sub('', it)
-                if it != '':
-                    content.append(it)
+                # 找到id为vsb_content的div标签
+                vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
 
-            dict['url'] = newUrl
-            dict['content'] = content
-            dict['title'] = title
-            dict['date'] = lastmodify
-            dics.append(dict)
-            print(dics)
-        i += 1
+                # 获取该div内部的所有内容（包括标签）的字符串表示
+                inner_content = str(vsb_content_div)
+                inner_content = patternDrop.sub('', inner_content)
+                subStrings = inner_content.split('</p>')
+
+                for it in subStrings:
+                    patternDrop.sub('', it)
+                    patternStrong.sub('', it)
+                    if it != '':
+                        content.append(it)
+
+                dict['url'] = newUrl
+                dict['content'] = content
+                dict['title'] = title
+                dict['date'] = lastmodify
+                dics.append(dict)
+                print(dics)
+            i += 1
+    return dics
