@@ -7,7 +7,7 @@ import requests
 import re
 import pytesseract
 import io
-
+import OCRFunction
 
 def work():
     urlIntro = "https://ccst.jlu.edu.cn/xygk/xyjj.htm"
@@ -63,7 +63,8 @@ def work():
                         if response.status_code == 200:
                             imageData = BytesIO(response.content)
                             image = Image.open(imageData)
-                            text = pytesseract.image_to_string(image)
+                            #text = pytesseract.image_to_string(image)
+                            text = OCRFunction.image2string(image)
                             content.append(text)
                             imageData.close()
                     else:
