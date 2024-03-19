@@ -95,6 +95,13 @@ def work():
         pagexpath = '/html/body/div[3]/div[2]/div[2]/div[1]/span[1]'
         resp = requests.get(urls[t])
         html = etree.HTML(resp.content)
+        titles = html.xpath(titlexpath)
+        for es in titles:
+            title = es.text
+        
+        dict['url'] = urls[t]
+        dict['title'] = title
+        dics.append(dict)
         divs = html.xpath(pagexpath)
         for div in divs:
             rows = div.text[1:-1]
