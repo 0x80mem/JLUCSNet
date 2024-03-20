@@ -4,7 +4,7 @@ import math
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+from selenium.webdriver.edge.options import Options
 
 def work():
     url1 = 'https://ccst.jlu.edu.cn/kxyj/xsdt.htm'
@@ -16,7 +16,9 @@ def work():
 
     urls = [url1,url2,url3,url5,url6]
 
-
+    options = Options()
+    options.use_chromium = True
+    options.add_argument('--headless')
     prelog = 'https://ccst.jlu.edu.cn'
     i = 1
 
@@ -57,7 +59,7 @@ def work():
         curPage = pages
         i = 1
         while curPage !=0:
-            browser = webdriver.Edge()
+            browser = webdriver.Edge(options=options)
             if curPage == pages:#说明当前在众多页中的第一页，则url不需要改变
                 browser.get(urls[t])
                 curPage -=1
