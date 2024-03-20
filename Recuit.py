@@ -4,7 +4,7 @@ import math
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+from selenium.webdriver.edge.options import Options
 
 def work():
     titlexpath = '/html/head/title[1]'
@@ -17,6 +17,9 @@ def work():
                              r'<div[^>]*>|</div>|</form>|<h2[^>]*>|</h2>|<tbody>|<table>|<a[^>]*>|</a>|</tbody>|</table>|\n|\xa0')
 
     patternStrong = re.compile(r'<strong[^>]*>', re.S)
+    options = Options()
+    options.use_chromium = True
+    options.add_argument('--headless')
     resp = requests.get(url)
     html = etree.HTML(resp.content)
     titles = html.xpath(titlexpath)
@@ -43,7 +46,7 @@ def work():
         }
         i = 1
         # 去取动态html转换为静态
-        browser = webdriver.Edge()
+        browser = webdriver.Edge(options=options)
         if curpages == pages:  # 说明当前在众多页中的第一页，则url不需要改变
             browser.get(url)
             curpages -= 1
