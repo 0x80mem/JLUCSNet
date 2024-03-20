@@ -4,7 +4,7 @@ import math
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+from selenium.webdriver.edge.options import Options
 
 def work():
     url1 = 'https://ccst.jlu.edu.cn/syzx/gjjjsjsyjxsfzx/sfzxjj.htm'
@@ -25,7 +25,9 @@ def work():
                              r'<div[^>]*>|</div>|</form>|<h2[^>]*>|</h2>|<tbody>|<table>|<a[^>]*>|</a>|</tbody>|</table>|\n|\r|\u3000|\xa0')
 
     patternStrong = re.compile(r'<strong[^>]*>',re.S)
-
+    options = Options()
+    options.use_chromium = True
+    options.add_argument('--headless')
     urls = [url1, url2, url3, url4, url5, url6, url7, url8, url10]  # 只有九个url，因为url9比较特殊，需要单独爬取
     t = 0
     dics = []
@@ -82,11 +84,11 @@ def work():
         titles = html.xpath(titlexpath)
         for es in titles:
             title = es.text
-            
+
         dict['url'] = urls[t]
         dict['title'] = title
         dics.append(dict)
-        
+
         coup = html.xpath(pagexpath)
 
         for it in coup:
@@ -94,9 +96,9 @@ def work():
 
         pages = math.ceil(rows / 10)  # 以上pages计算出了一共有多少页
         curPage = pages
-    
+
         while curPage != 0:
-            browser = webdriver.Edge()
+            browser = webdriver.Edge(options=options)
             if curPage == pages:  # 说明当前在众多页中的第一页，则url不需要改变
                 browser.get(urls2[t])
                 curPage -= 1
