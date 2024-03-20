@@ -4,7 +4,7 @@ import math
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+from selenium.webdriver.edge.options import Options
 
 def work():
     url1 = 'https://ccst.jlu.edu.cn/xwzx/xytz.htm'
@@ -14,7 +14,9 @@ def work():
     url5 = 'https://ccst.jlu.edu.cn/xwzx/gsl.htm'
 
     urls = [url1, url2, url3, url4, url5]
-
+    options = Options()
+    options.use_chromium = True
+    options.add_argument('--headless')
     prelog = 'https://ccst.jlu.edu.cn'
     patternDrop = re.compile(r'<p[^>]*>|<\/p>|<br>|<br[^>]*>|&nbsp;|<span[^>]*>|'
                              r'<\/span>|<li[^>]*>|</li>|<ol[^>]*>|<\/ol>|'
@@ -41,7 +43,7 @@ def work():
         titles = html.xpath(titlexpath)
         for es in titles:
             title = es.text
-            
+
         dict['title'] = title
         dict['url'] = urls[t]
         dics.append(dict)
@@ -56,7 +58,7 @@ def work():
         # 先获取页面的动态html，将其转化为静态代码
         while curpages != 0:
             i = 1
-            browser = webdriver.Edge()
+            browser = webdriver.Edge(options=options)
             if curpages == pages:  # 说明当前在众多页中的第一页，则url不需要改变
                 browser.get(urls[t])
                 curpages -= 1
