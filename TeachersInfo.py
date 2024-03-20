@@ -232,7 +232,7 @@ def work():
 
     #print(strs)
     # 替换成您的 API Key 和 Secret Key
-    ak = cak
+    '''ak = cak
     sk = csk
 
     qianfan_sa = QianfanSemanticAnalysis(ak, sk)
@@ -247,5 +247,5 @@ def work():
     result = qianfan_sa.semantic_analysis(precommand + strs)
 
         # 输出语义分析结果
-    print("语义分析结果：", result)
+    print("语义分析结果：", result)'''
     return members
