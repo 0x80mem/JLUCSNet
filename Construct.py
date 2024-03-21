@@ -62,13 +62,11 @@ def work():
 
         inner_content = patternDrop.sub('',inner_content)
 
-        subStrings = inner_content.split('<strong>')
+        #subStrings = inner_content.split('<strong>')
 
-        for it in subStrings:
-            patternDrop.sub('',it)
-            patternStrong.sub('',it)
-            if it != '':
-                content.append(it)
+        inner_content = patternStrong.sub('',inner_content)
+        if inner_content != '':
+            content.append(inner_content)
 
         key = urls[t]
         dict['url'] = urls[t]
