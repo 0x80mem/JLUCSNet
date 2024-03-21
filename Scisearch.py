@@ -97,20 +97,17 @@ def work():
                     # 获取该div内部的所有内容（包括标签）的字符串表示
                     inner_content = str(vsb_content_div)
                     inner_content = patternDrop.sub('', inner_content)
-                    if t == 1 or 3:
+                    '''if t == 1 or 3:
                         subStrings = inner_content.split('<strong>')
                     if t == 2:
                         subStrings = inner_content.split('<br>')
                     if t == 4:
-                        subStrings = inner_content.split('</p>')
+                        subStrings = inner_content.split('</p>')'''
                     #因为第三大页的格式相对不统一，因此就不进行划分
 
-
-                    for it in subStrings:
-                        patternDrop.sub('', it)
-                        patternStrong.sub('', it)
-                        if it != '':
-                            content.append(it)
+                    inner_content = patternStrong.sub('', inner_content)
+                    if inner_content != '':
+                        content.append(inner_content)
                     dict['url'] = newUrl
                     dict['content'] = content
                     dict['title'] = title
