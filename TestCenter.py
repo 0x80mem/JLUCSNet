@@ -53,12 +53,10 @@ def work():
         # 获取该div内部的所有内容（包括标签）的字符串表示
         inner_content = str(vsb_content_div)
         inner_content = patternDrop.sub('', inner_content)
-        subStrings = inner_content.split('</p>')
-        for it in subStrings:
-            patternDrop.sub('', it)
-            patternStrong.sub('', it)
-            if it != '':
-                content.append(it)
+        
+        inner_content = patternStrong.sub('', inner_content)
+        if inner_content != '':
+            content.append(inner_content)
         dict['url'] = urls[t]
         dict['title'] = title
         dict['content'] = content
@@ -135,13 +133,10 @@ def work():
                     # 获取该div内部的所有内容（包括标签）的字符串表示
                     inner_content = str(vsb_content_div)
                     inner_content = patternDrop.sub('', inner_content)
-                    subStrings = inner_content.split('</p>')
-
-                    for it in subStrings:
-                        patternDrop.sub('', it)
-                        patternStrong.sub('', it)
-                        if it != '':
-                            content.append(it)
+                    
+                    inner_content = patternStrong.sub('', inner_content)
+                    if inner_content != '':
+                        content.append(inner_content)
                     dict['url'] = newUrl
                     dict['title'] = title
                     dict['content'] = content
