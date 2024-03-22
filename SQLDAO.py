@@ -50,7 +50,7 @@ class SQLDAO:
                     self.vector_store = FAISS.from_texts(
                         texts=texts,
                         embedding=self.embeddings,
-                        metadatas=[{"date": page['date']} for _ in range(len(texts))],
+                        metadatas=[{"url": url, "date": page['date']} for _ in range(len(texts))],
                     )
                 else:
                     for i, text in enumerate(texts):
