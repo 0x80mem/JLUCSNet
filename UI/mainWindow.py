@@ -7,9 +7,10 @@ from PyQt5.QtWidgets import QPushButton
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, gpt_fn=None):
+    def __init__(self,role="You", gpt_fn=None):
         super().__init__()
         self.btn = None
+        self.role = role
         self.gpt_fn = gpt_fn
         self.widget_list = []
         self.ui = Ui_MainWindow()
@@ -89,7 +90,7 @@ class MainWindow(QMainWindow):
             return
 
         # 创建消息
-        msg = Message(user_input, "img/avatar.jpg", "You", parent=self.ui.chat_widget)
+        msg = Message(user_input,  self.role, parent=self.ui.chat_widget)
         msg.setText(user_input)
         self.display_message(msg)
         # 清空输入框
@@ -97,11 +98,14 @@ class MainWindow(QMainWindow):
 
         # 回复
         reply = ""
+        reply_msg = None
         if self.gpt_fn is not None:
-            reply = gpt_fn(user_input)
-        reply_msg = Message(reply, parent=self.ui.chat_widget)
-        self.display_message(reply_msg)
+            output = gpt_fn(user_input)
+            reply_msg = Message(output['reply'],output['role'], parent=self.ui.chat_widget)
+        else:
+            reply_msg = Message(reply, parent=self.ui.chat_widget)
 
+        self.display_message(reply_msg)
         self.widget_list.append(msg)
         self.widget_list.append(reply_msg)
 
@@ -112,12 +116,12 @@ class MainWindow(QMainWindow):
 
 # 避免输出无空格及换行符的一连串英文或数字
 def gpt_fn(user_input):
-    return "Unknown " * 50
+    return {'reply': 'unknown '*50 , 'role': 'ChatG7PT'}
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow(gpt_fn)
+    window = MainWindow("You",gpt_fn)
     window.show()
 
     sys.exit(app.exec_())
