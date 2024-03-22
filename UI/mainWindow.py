@@ -98,23 +98,26 @@ class MainWindow(QMainWindow):
         # 回复
         reply = ""
         if self.gpt_fn is not None:
-            reply = self.gpt_fn(user_input)
+            reply = gpt_fn(user_input)
         reply_msg = Message(reply, parent=self.ui.chat_widget)
         self.display_message(reply_msg)
 
         self.widget_list.append(msg)
         self.widget_list.append(reply_msg)
 
+    def show(self):
+        super().show()
+        self.ui.chat_widget.setFixedWidth(self.ui.chat_area.width())
 
-# # 示例
 
-# # 避免输出无空格及换行符的一连串英文或数字
-# def gpt_fn(user_input):
-#     return "Unknown " * 50
-#
+# 避免输出无空格及换行符的一连串英文或数字
+def gpt_fn(user_input):
+    return "Unknown " * 50
 
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = MainWindow(gpt_fn)
-#     window.show()
-#     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow(gpt_fn)
+    window.show()
+
+    sys.exit(app.exec_())
