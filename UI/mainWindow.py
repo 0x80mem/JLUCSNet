@@ -2,16 +2,18 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from ui.main import Ui_MainWindow
 from ui.Message import Message
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QPushButton
 
 
 class MainWindow(QMainWindow):
-    def __init__(self,role="You", gpt_fn=None):
+
+    input_signal = pyqtSignal(str)
+    def __init__(self,role="You",gpt_slot=None):
         super().__init__()
         self.btn = None
         self.role = role
-        self.gpt_fn = gpt_fn
+        self.gpt_slot = gpt_slot
         self.widget_list = []
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self, list)
@@ -60,6 +62,9 @@ class MainWindow(QMainWindow):
         )
         self.ui.chat_area.setAutoFillBackground(False)
 
+        # 连接input信号和gpt槽
+        self.input_signal.connect(self.gpt_slot)
+
     def resizeEvent(self, event):
         # super().resizeEvent(a0)
         self.ui.up_size()
@@ -68,11 +73,12 @@ class MainWindow(QMainWindow):
         for i in self.widget_list:
             i.update_size()
 
-    def display_message(self, message):
-        message.setParent(self.ui.chat_widget)
+    def display_message(self, message, role):
+        msg = Message(message, role, parent=self.ui.chat_widget)
+        msg.setParent(self.ui.chat_widget)
         self.ui.chat_widget.setFixedWidth(self.ui.chat_area.width())
         # 将消息添加到对话记录显示区域
-        self.ui.chat_widget_layout.addWidget(message)
+        self.ui.chat_widget_layout.addWidget(msg)
         self.ui.chat_widget_layout.setAlignment(Qt.AlignTop)  # 保证新消息总是在顶部可见
 
     def scroll_to_bottom(self):
@@ -81,6 +87,7 @@ class MainWindow(QMainWindow):
         )
 
     def send_message(self):
+
         self.ui.chat_widget.setFixedWidth(self.ui.chat_area.width())
         # 获取用户输入
         user_input = self.ui.textEdit.toPlainText().strip()
@@ -89,34 +96,23 @@ class MainWindow(QMainWindow):
         if not user_input:
             return
 
-        # 创建消息
-        msg = Message(user_input,  self.role, parent=self.ui.chat_widget)
-        msg.setText(user_input)
-        self.display_message(msg)
+        self.input_signal.emit(user_input)
+
+
+        self.display_message(user_input,self.role)
         # 清空输入框
         self.ui.textEdit.clear()
 
-        # 回复
-        reply = ""
-        reply_msg = None
-        if self.gpt_fn is not None:
-            output = gpt_fn(user_input)
-            reply_msg = Message(output['reply'],output['role'], parent=self.ui.chat_widget)
-        else:
-            reply_msg = Message(reply, parent=self.ui.chat_widget)
-
-        self.display_message(reply_msg)
-        self.widget_list.append(msg)
-        self.widget_list.append(reply_msg)
 
     def show(self):
         super().show()
         self.ui.chat_widget.setFixedWidth(self.ui.chat_area.width())
 
 
-# 避免输出无空格及换行符的一连串英文或数字
-def gpt_fn(user_input):
-    return {'reply': 'unknown '*50 , 'role': 'ChatG7PT'}
+
+def gpt_slot(user_input):
+    print("is a slot ")
+    print(user_input)
 
 
 if __name__ == "__main__":
