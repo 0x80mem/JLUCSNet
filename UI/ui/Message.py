@@ -1,10 +1,10 @@
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
-
+from ui.roleInfo import roleInfo
 from ui.avatar import AvatarLabel
 
 class Message(QWidget):
-    def __init__(self, text, image_path="./img/chatGPT", name="ChatGPT", parent=None):
+    def __init__(self, text,role = "ChatGPT", parent=None):
         super().__init__(parent)
         self.parent = parent
         layout = QVBoxLayout(self)
@@ -13,12 +13,14 @@ class Message(QWidget):
         topLayout = QHBoxLayout(topWidget)
 
         # 创建头像标签
-        self.avatar = AvatarLabel(image_path, self)
+        avatar_path = roleInfo.get(role)
+        avatar_path = "" if avatar_path is None else avatar_path
+        self.avatar = AvatarLabel(avatar_path, self)
         topLayout.addWidget(self.avatar)
         # 名字
         topLayout.addWidget(QLabel(
             "<p style='margin-left:10px;font-size:22px;font-family:微软雅黑;color:rgb(230, 230, 230);line-height:40px; "
-            "width:100% ; white-space: pre-wrap; letter-spacing: 3px'>" + name + "</p>"))
+            "width:100% ; white-space: pre-wrap; letter-spacing: 3px'>" + role + "</p>"))
         layout.addWidget(topWidget)
 
         # 创建文本Label
