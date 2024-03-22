@@ -7,6 +7,12 @@ from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 
 def work():
+    dict = {
+        'url': [],
+        'title': [],
+        'content': [],
+        'date': []
+    }
     titlexpath = '/html/head/title[1]'
     dics = []
     url = 'https://ccst.jlu.edu.cn/gny.htm'
