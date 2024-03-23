@@ -51,7 +51,7 @@ def work():
             coup = html.xpath(pagexpath)
 
             for it in coup:
-                rows = int(it.text[1:4])
+                rows = int(it.text[1:-1])
 
             pages = math.ceil(rows / 10)  # 以上pages计算出了一共有多少页
             curPage = pages
@@ -148,11 +148,11 @@ def work():
                             title = e.text  # 获取标题
                         soup = BeautifulSoup(resp.content,'html.parser')
                         vsb_content_div = soup.find('div', id='vsb_content')
-    
+
                         # 获取该div内部的所有内容（包括标签）的字符串表示
                         inner_content = str(vsb_content_div)
                         inner_content = patternDrop.sub('', inner_content)
-    
+
                         inner_content = patternStrong.sub('', inner_content)
                         if inner_content != '':
                             content.append(inner_content)
@@ -164,7 +164,7 @@ def work():
                         print(dics)
                     else:
                         print("页面出错")
-                        
+
             r += 1
     else:
         print("页面出错")
