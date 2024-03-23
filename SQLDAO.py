@@ -55,7 +55,7 @@ class SQLDAO:
                     self.session.merge(Content(url=url, start_paragraph=i, content=content))
                     self.session.commit()
 
-                    text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=64)
+                    text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=64)
                     texts = text_splitter.split_text(content)
                     if self.vector_store is None:
                         self.vector_store = FAISS.from_texts(
