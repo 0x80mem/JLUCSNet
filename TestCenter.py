@@ -49,7 +49,7 @@ def work():
             for e in titles:
                 title = e.text  # 获取标题
             soup = BeautifulSoup(resp.content, 'html.parser')
-            vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
+            vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100','vsb_content_2'])
 
             # 获取该div内部的所有内容（包括标签）的字符串表示
             inner_content = str(vsb_content_div)
@@ -63,7 +63,7 @@ def work():
             dict['content'] = content
             dict['date'] = lastmodify
             dics.append(dict)
-            print(dics)
+            print(dict)
             t += 1
         else:
             print("页面有错")
@@ -133,12 +133,12 @@ def work():
                         for e in titles:
                             title = e.text  # 获取标题
                         # 找到id为vsb_content的div标签
-                        vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
-    
+                        vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
+
                         # 获取该div内部的所有内容（包括标签）的字符串表示
                         inner_content = str(vsb_content_div)
                         inner_content = patternDrop.sub('', inner_content)
-    
+
                         inner_content = patternStrong.sub('', inner_content)
                         if inner_content != '':
                             content.append(inner_content)
@@ -147,7 +147,7 @@ def work():
                         dict['content'] = content
                         dict['date'] = lastmodify
                         dics.append(dict)
-                        print(dics)
+                        print(dict)
                     else:
                         print("页面出错")
 
