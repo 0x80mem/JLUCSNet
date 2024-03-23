@@ -56,18 +56,18 @@ def work():
             pages = math.ceil(rows / 10)  # 以上pages计算出了一共有多少页
             curPage = pages
             i = 1
-            while curPage !=0:
+            while curPage != 0:
                 browser = webdriver.Edge(options=options)
                 if curPage == pages:#说明当前在众多页中的第一页，则url不需要改变
                     browser.get(urls[t])
-                    curPage -=1
+                    curPage -= 1
                 else:#url需要改变
                     url = urls[t][:-4] + '/'+str(curPage) + urls[t][-4:]
                     curPage -= 1
                     browser.get(url)
 
                 htmlStr = browser.page_source
-                print(htmlStr)#将第t页的动态码转换为静态字串
+                #print(htmlStr)#将第t页的动态码转换为静态字串
                 browser.close()
                 html = etree.HTML(htmlStr)#把静态字串转换为HTML
 
@@ -92,7 +92,7 @@ def work():
                             soup = BeautifulSoup(resp2.content, 'html.parser')
 
                             # 找到id为vsb_content的div标签
-                            vsb_content_div = soup.find('div', id='vsb_content')
+                            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
 
                             # 获取该div内部的所有内容（包括标签）的字符串表示
                             inner_content = str(vsb_content_div)
@@ -105,7 +105,7 @@ def work():
                             dict['content'] = content
                             dict['date'] = lastmodify
                             dics.append(dict)
-                            print(dics)
+                            print(dict)
                         else:
                             print("页面出错")
                     i += 1
@@ -161,7 +161,7 @@ def work():
                         dict['content'] = content
                         dict['date'] = lastmodify
                         dics.append(dict)
-                        print(dics)
+                        print(dict)
                     else:
                         print("页面出错")
 
