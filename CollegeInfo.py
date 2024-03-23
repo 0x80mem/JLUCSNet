@@ -36,46 +36,52 @@ def work():
         }
         content = []
         resp = requests.get(urls[t])
-        resp_headers = resp.headers
-        lastmodify = resp_headers.get('Last-Modified')
-        resp.encoding = 'UTF-8'
-        html = etree.HTML(resp.content)
-        titles = html.xpath(titlexpath)
-        for rs in titles:
-            title = rs.text
+        if resp.status_code == 200:
+            resp_headers = resp.headers
+            lastmodify = resp_headers.get('Last-Modified')
+            resp.encoding = 'UTF-8'
+            html = etree.HTML(resp.content)
+            titles = html.xpath(titlexpath)
+            for rs in titles:
+                title = rs.text
 
-        divs = html.xpath(xpaths[t])
-        for div in divs:
-            #下面将对p标签的内容进行读取，并且每个p标签均存到数组中
-            if div.text!=None:
-                div.text = patternDrop.sub('', div.text)
-                if div.text != '':
-                    content.append(div.text)
-            if t == 2:
+            divs = html.xpath(xpaths[t])
+            for div in divs:
+                #下面将对p标签的内容进行读取，并且每个p标签均存到数组中
+                if div.text!=None:
+                    div.text = patternDrop.sub('', div.text)
+                    if div.text != '':
+                        content.append(div.text)
+                if t == 2:
 
-                match = patternImg.finditer(resp.text)
+                    match = patternImg.finditer(resp.text)
 
-                for it in match:
+                    for it in match:
 
-                    if it.group('wantPhoto'):
-                        source = prelog + it.group('wantPhoto')
-                        response = requests.get(source)
-                        if response.status_code == 200:
-                            imageData = BytesIO(response.content)
-                            image = Image.open(imageData)
-                            #text = pytesseract.image_to_string(image)
-                            text = OCRFunction.image2string(image)
-                            content.append(text)
-                            imageData.close()
-                    else:
-                        break
-        key = urls[t]
-        dict['url'] = urls[t]
-        dict['title'] = title
-        dict['content'] = content
-        dict['date'] = lastmodify
-        dics.append(dict)
-        print(dics)
-        t+=1
+                        if it.group('wantPhoto'):
+                            source = prelog + it.group('wantPhoto')
+                            response = requests.get(source)
+                            if response.status_code == 200:
+                                imageData = BytesIO(response.content)
+                                image = Image.open(imageData)
+                                #text = pytesseract.image_to_string(image)
+                                text = OCRFunction.image2string(image)
+                                content.append(text)
+                                imageData.close()
+                        else:
+                            break
+            key = urls[t]
+            dict['url'] = urls[t]
+            dict['title'] = title
+            dict['content'] = content
+            dict['date'] = lastmodify
+            dics.append(dict)
+            print(dics)
+            t+=1
+
+        else:
+            print("页面不存在")
+            t+=1
+
     return dics
 
