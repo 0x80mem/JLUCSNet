@@ -41,29 +41,33 @@ def work():
         }
         content = []
         resp = requests.get(urls[t])
-        resp_headers = resp.headers
-        lastmodify = resp_headers.get('Last-Modified')
-        html2 = etree.HTML(resp.content)
-        titles = html2.xpath(titlexpath)
-        for e in titles:
-            title = e.text  # 获取标题
-        soup = BeautifulSoup(resp.content, 'html.parser')
-        vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
+        if resp.status_code == 200:
+            resp_headers = resp.headers
+            lastmodify = resp_headers.get('Last-Modified')
+            html2 = etree.HTML(resp.content)
+            titles = html2.xpath(titlexpath)
+            for e in titles:
+                title = e.text  # 获取标题
+            soup = BeautifulSoup(resp.content, 'html.parser')
+            vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
 
-        # 获取该div内部的所有内容（包括标签）的字符串表示
-        inner_content = str(vsb_content_div)
-        inner_content = patternDrop.sub('', inner_content)
-        
-        inner_content = patternStrong.sub('', inner_content)
-        if inner_content != '':
-            content.append(inner_content)
-        dict['url'] = urls[t]
-        dict['title'] = title
-        dict['content'] = content
-        dict['date'] = lastmodify
-        dics.append(dict)
-        print(dics)
-        t += 1
+            # 获取该div内部的所有内容（包括标签）的字符串表示
+            inner_content = str(vsb_content_div)
+            inner_content = patternDrop.sub('', inner_content)
+
+            inner_content = patternStrong.sub('', inner_content)
+            if inner_content != '':
+                content.append(inner_content)
+            dict['url'] = urls[t]
+            dict['title'] = title
+            dict['content'] = content
+            dict['date'] = lastmodify
+            dics.append(dict)
+            print(dics)
+            t += 1
+        else:
+            print("页面有错")
+            t += 1
 
     # 下面开始爬取url9和url11的内容
     urls2 = [url9,url11]
@@ -120,29 +124,32 @@ def work():
                     print(newUrl)
                     # 下面对这个newUrl进行访问，并获取文章内容
                     resp = requests.get(newUrl)
-                    resp_headers = resp.headers
-                    lastmodify = resp_headers.get('Last-Modified')
-                    soup = BeautifulSoup(resp.content, 'html.parser')
-                    html2 = etree.HTML(resp.content)
-                    titles = html2.xpath(titlexpath)
-                    for e in titles:
-                        title = e.text  # 获取标题
-                    # 找到id为vsb_content的div标签
-                    vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
-
-                    # 获取该div内部的所有内容（包括标签）的字符串表示
-                    inner_content = str(vsb_content_div)
-                    inner_content = patternDrop.sub('', inner_content)
-                    
-                    inner_content = patternStrong.sub('', inner_content)
-                    if inner_content != '':
-                        content.append(inner_content)
-                    dict['url'] = newUrl
-                    dict['title'] = title
-                    dict['content'] = content
-                    dict['date'] = lastmodify
-                    dics.append(dict)
-                    print(dics)
+                    if resp.status_code == 200:
+                        resp_headers = resp.headers
+                        lastmodify = resp_headers.get('Last-Modified')
+                        soup = BeautifulSoup(resp.content, 'html.parser')
+                        html2 = etree.HTML(resp.content)
+                        titles = html2.xpath(titlexpath)
+                        for e in titles:
+                            title = e.text  # 获取标题
+                        # 找到id为vsb_content的div标签
+                        vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
+    
+                        # 获取该div内部的所有内容（包括标签）的字符串表示
+                        inner_content = str(vsb_content_div)
+                        inner_content = patternDrop.sub('', inner_content)
+    
+                        inner_content = patternStrong.sub('', inner_content)
+                        if inner_content != '':
+                            content.append(inner_content)
+                        dict['url'] = newUrl
+                        dict['title'] = title
+                        dict['content'] = content
+                        dict['date'] = lastmodify
+                        dics.append(dict)
+                        print(dics)
+                    else:
+                        print("页面出错")
 
                 i += 1
         t += 1
