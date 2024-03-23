@@ -87,7 +87,7 @@ def work():
                     soup = BeautifulSoup(resp2.content, 'html.parser')
 
                     # 找到id为vsb_content的div标签
-                    vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
+                    vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100','vsb_content_2'])
 
                     # 获取该div内部的所有内容（包括标签）的字符串表示
                     inner_content = str(vsb_content_div)
@@ -102,7 +102,7 @@ def work():
                     dict['title'] = title
                     dict['date'] = lastmodify
                     dics.append(dict)
-                    print(dics)
+                    print(dict)
                 else:
                     print("页面出错")
             i += 1
