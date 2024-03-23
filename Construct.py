@@ -7,9 +7,10 @@ import re
 from bs4 import BeautifulSoup
 import pytesseract
 import io
+from checkUrl import addGotted
+from checkUrl import findGotted
 
-
-def work():
+def work(insertInfo):
     urlMain = 'https://ccst.jlu.edu.cn/xkjs/zyyjfx1.htm'
     urlsoft = 'https://ccst.jlu.edu.cn/xkjs/zyyjfx1/jsjrjyll.htm'
     urlapp = 'https://ccst.jlu.edu.cn/xkjs/zyyjfx1/jsjyyjs.htm'
@@ -43,41 +44,47 @@ def work():
             'date': []
         }
         content = []
-        resp = requests.get(urls[t])
-        if resp.status_code == 200:
-            html = etree.HTML(resp.content)
-            divs = html.xpath(titlexpath)
-            for div in divs:
-                title = div.text
-            resp_headers = resp.headers
-            lastmodify = resp_headers.get('Last-Modified')
-            resp.encoding = 'UTF-8'
-
-            soup = BeautifulSoup(resp.content, 'html.parser')
-
-            # 找到id为vsb_content的div标签
-            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
-
-            # 获取该div内部的所有内容（包括标签）的字符串表示
-            inner_content = str(vsb_content_div)
-
-            inner_content = patternDrop.sub('',inner_content)
-
-            #subStrings = inner_content.split('<strong>')
-
-            inner_content = patternStrong.sub('',inner_content)
-            if inner_content != '':
-                content.append(inner_content)
-
-            key = urls[t]
-            dict['url'] = urls[t]
-            dict['title'] = title
-            dict['content'] = content
-            dict['date'] = lastmodify
-            dics.append(dict)
-            print(dict)
+        if findGotted(urls[t]) == -1:
             t += 1
+            continue
         else:
-            print("页面不存在")
-            t += 1
+            resp = requests.get(urls[t])
+            if resp.status_code == 200:
+                html = etree.HTML(resp.content)
+                divs = html.xpath(titlexpath)
+                for div in divs:
+                    title = div.text
+                resp_headers = resp.headers
+                lastmodify = resp_headers.get('Last-Modified')
+                resp.encoding = 'UTF-8'
+
+                soup = BeautifulSoup(resp.content, 'html.parser')
+
+                # 找到id为vsb_content的div标签
+                vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
+
+                # 获取该div内部的所有内容（包括标签）的字符串表示
+                inner_content = str(vsb_content_div)
+
+                inner_content = patternDrop.sub('',inner_content)
+
+                #subStrings = inner_content.split('<strong>')
+
+                inner_content = patternStrong.sub('',inner_content)
+                if inner_content != '':
+                    content.append(inner_content)
+
+                key = urls[t]
+                dict['url'] = urls[t]
+                dict['title'] = title
+                dict['content'] = content
+                dict['date'] = lastmodify
+                dics.append(dict)
+                addGotted(urls[t])
+                insertInfo(dict)
+                print(dict)
+                t += 1
+            else:
+                print("页面不存在")
+                t += 1
     return dics
