@@ -46,16 +46,16 @@ def work():
             titles = html.xpath(titlexpath)
             for es in titles:
                 title = es.text
-    
+
             dict['url'] = urls[t]
             dict['title'] = title
             dics.append(dict)
-    
+
             coup = html.xpath(pagexpath)
-    
+
             for it in coup:
                 rows = int(it.text[1:4])
-    
+
             pages = math.ceil(rows / 10)  # 以上pages计算出了一共有多少页
             curPage = pages
             i = 1
@@ -68,12 +68,12 @@ def work():
                     url = urls[t][:-4] + '/'+str(curPage) + urls[t][-4:]
                     curPage -= 1
                     browser.get(url)
-    
+
                 htmlStr = browser.page_source
-                print(htmlStr)#将第t页的动态码转换为静态字串
+                #print(htmlStr)#将第t页的动态码转换为静态字串
                 browser.close()
                 html = etree.HTML(htmlStr)#把静态字串转换为HTML
-    
+
                 i = 1
                 while i != 11:
                     rowxpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/a[1]'  # 获取连接用的xpath
@@ -92,10 +92,10 @@ def work():
                             for rs in res:
                                 title = rs.text
                             soup = BeautifulSoup(resp.content, 'html.parser')
-        
+
                             # 找到id为vsb_content的div标签
-                            vsb_content_div = soup.find('div', id='vsb_content')
-        
+                            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
+
                             # 获取该div内部的所有内容（包括标签）的字符串表示
                             inner_content = str(vsb_content_div)
                             inner_content = patternDrop.sub('', inner_content)
@@ -106,7 +106,7 @@ def work():
                             if t == 4:
                                 subStrings = inner_content.split('</p>')'''
                             #因为第三大页的格式相对不统一，因此就不进行划分
-        
+
                             inner_content = patternStrong.sub('', inner_content)
                             if inner_content != '':
                                 content.append(inner_content)
@@ -115,14 +115,14 @@ def work():
                             dict['title'] = title
                             dict['date'] = lastmodify
                             dics.append(dict)
-                            print(dics)
+                            print(dict)
                         else:
                             print("页面出错")
-                            
+
                     i += 1
         else:
             print("页面出错")
-            
+
         t +=1
     return dics
 
