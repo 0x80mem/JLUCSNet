@@ -8,7 +8,7 @@ import re
 import pytesseract
 import io
 import OCRFunction
-from history import History
+from histroy import History
 def work():
     urlIntro = "https://ccst.jlu.edu.cn/xygk/xyjj.htm"
     urlMessage = "https://ccst.jlu.edu.cn/xygk/yzjy.htm"
@@ -76,7 +76,7 @@ def work():
             dict['content'] = content
             dict['date'] = lastmodify
             dics.append(dict)
-            print(dics)
+            print(dict)
             t += 1
 
         else:
