@@ -103,17 +103,17 @@ def work():
             titles = html.xpath(titlexpath)
             for es in titles:
                 title = es.text
-    
+
             dict['url'] = urls[t]
             dict['title'] = title
             dics.append(dict)
             divs = html.xpath(pagexpath)
             for div in divs:
                 rows = div.text[1:-1]
-    
+
             pages = math.ceil(int(rows)/10)
             curpages = pages
-    
+
             # 先获取页面的动态html，将其转化为静态代码
             while curpages != 0:
                 i = 1
@@ -125,12 +125,12 @@ def work():
                     url = urls[t][:-4] + '/' + str(curpages) + urls[t][-4:]
                     curpages -= 1
                     browser.get(url)
-    
+
                 htmlStr = browser.page_source
                 # print(htmlStr)  # 将第t页的动态码转换为静态字串
                 browser.close()
                 html = etree.HTML(htmlStr)  # 把静态字串转换为HTML
-    
+
                 # 下面开始获取li
                 i = 1
                 while i != 11:
@@ -142,33 +142,36 @@ def work():
                         # print(newUrl)
                         # 下面对这个newUrl进行访问，并获取文章内容
                         resp2 = requests.get(newUrl)
-                        resp2_headers = resp2.headers
-                        lastmodify = resp_headers.get('Last-Modified')
-                        html2 = etree.HTML(resp2.content)
-                        titles = html2.xpath(titlexpath)
-                        for e in titles:
-                            title = e.text  # 获取标题
+                        if resp2.status_code == 200:
+                            resp2_headers = resp2.headers
+                            lastmodify = resp2_headers.get('Last-Modified')
+                            html2 = etree.HTML(resp2.content)
+                            titles = html2.xpath(titlexpath)
+                            for e in titles:
+                                title = e.text  # 获取标题
     
-                        soup = BeautifulSoup(resp2.content, 'html.parser')
+                            soup = BeautifulSoup(resp2.content, 'html.parser')
     
-                        # 找到id为vsb_content的div标签
-                        vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
+                            # 找到id为vsb_content的div标签
+                            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
     
-                        # 获取该div内部的所有内容（包括标签）的字符串表示
-                        inner_content = str(vsb_content_div)
-                        inner_content = patternDrop.sub('', inner_content)
-                        inner_content = patternStrong.sub('', inner_content)
-                        if inner_content != '':
-                             content.append(inner_content)
+                            # 获取该div内部的所有内容（包括标签）的字符串表示
+                            inner_content = str(vsb_content_div)
+                            inner_content = patternDrop.sub('', inner_content)
+                            inner_content = patternStrong.sub('', inner_content)
+                            if inner_content != '':
+                                 content.append(inner_content)
     
-                        dict['url'] = newUrl
-                        dict['content'] = content
-                        dict['title'] = title
-                        dict['date'] = lastmodify
-                        dics.append(dict)
-                        print(dics)
+                            dict['url'] = newUrl
+                            dict['content'] = content
+                            dict['title'] = title
+                            dict['date'] = lastmodify
+                            dics.append(dict)
+                            print(dics)
+                        else:
+                            print("页面出错")
                     i += 1
-    
+
             t += 1
         else:
             print("页面出错")
