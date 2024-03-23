@@ -58,7 +58,7 @@ def work():
 
             soup = BeautifulSoup(resp.content,'html.parser')
 
-            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
+            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
 
             inner_content = str(vsb_content_div)
             inner_content = patternDrop.sub('', inner_content)
@@ -71,7 +71,7 @@ def work():
             dict['title'] = title
             dict['date'] = lastmodify
             dics.append(dict)
-            print(dics)
+            print(dict)
             t += 1
         else:
             print("页面不存在")
@@ -149,25 +149,25 @@ def work():
                             titles = html2.xpath(titlexpath)
                             for e in titles:
                                 title = e.text  # 获取标题
-    
+
                             soup = BeautifulSoup(resp2.content, 'html.parser')
-    
+
                             # 找到id为vsb_content的div标签
-                            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100'])
-    
+                            vsb_content_div = soup.find('div', id=['vsb_content','vsb_content_100','vsb_content_2'])
+
                             # 获取该div内部的所有内容（包括标签）的字符串表示
                             inner_content = str(vsb_content_div)
                             inner_content = patternDrop.sub('', inner_content)
                             inner_content = patternStrong.sub('', inner_content)
                             if inner_content != '':
                                  content.append(inner_content)
-    
+
                             dict['url'] = newUrl
                             dict['content'] = content
                             dict['title'] = title
                             dict['date'] = lastmodify
                             dics.append(dict)
-                            print(dics)
+                            print(dict)
                         else:
                             print("页面出错")
                     i += 1
