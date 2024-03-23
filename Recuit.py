@@ -5,8 +5,9 @@ import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
-
-def work():
+from checkUrl import addGotted
+from checkUrl import findGotted
+def work(insertInfo):
     dict = {
         'url': [],
         'title': [],
@@ -33,6 +34,7 @@ def work():
         title = es.text
     dict['url'] = url
     dict['title'] = title
+    insertInfo(dict)
     dics.append(dict)
     divs = html.xpath(pagexpath)
     prelog = 'https://ccst.jlu.edu.cn'
@@ -56,11 +58,12 @@ def work():
         if curpages == pages:  # 说明当前在众多页中的第一页，则url不需要改变
             browser.get(url)
             curpages -= 1
+
         else:  # url需要改变
             url = url[:-4] + '/' + str(curpages) + url[-4:]
             curpages -= 1
             browser.get(url)
-
+        finUrl = url
         htmlStr = browser.page_source
         browser.close()
         html = etree.HTML(htmlStr)  # 把静态字串转换为HTML
@@ -75,35 +78,41 @@ def work():
                 newUrl = prelog + '/' + div.get('href')
                 # print(newUrl)
                 # 下面对这个newUrl进行访问，并获取文章内容
-                resp2 = requests.get(newUrl)
-                if resp2.status_code == 200:
-                    resp2_headers = resp2.headers
-                    lastmodify = resp2_headers.get('Last-Modified')
-                    html2 = etree.HTML(resp2.content)
-                    titles = html2.xpath(titlexpath)
-                    for e in titles:
-                        title = e.text  # 获取标题
-
-                    soup = BeautifulSoup(resp2.content, 'html.parser')
-
-                    # 找到id为vsb_content的div标签
-                    vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100','vsb_content_2'])
-
-                    # 获取该div内部的所有内容（包括标签）的字符串表示
-                    inner_content = str(vsb_content_div)
-                    inner_content = patternDrop.sub('', inner_content)
-
-                    inner_content = patternStrong.sub('', inner_content)
-                    if inner_content != '':
-                        content.append(inner_content)
-
-                    dict['url'] = newUrl
-                    dict['content'] = content
-                    dict['title'] = title
-                    dict['date'] = lastmodify
-                    dics.append(dict)
-                    print(dict)
+                if findGotted(newUrl) == -1:
+                    continue
                 else:
-                    print("页面出错")
+                    resp2 = requests.get(newUrl)
+                    if resp2.status_code == 200:
+                        resp2_headers = resp2.headers
+                        lastmodify = resp2_headers.get('Last-Modified')
+                        html2 = etree.HTML(resp2.content)
+                        titles = html2.xpath(titlexpath)
+                        for e in titles:
+                            title = e.text  # 获取标题
+
+                        soup = BeautifulSoup(resp2.content, 'html.parser')
+
+                        # 找到id为vsb_content的div标签
+                        vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100','vsb_content_2'])
+
+                        # 获取该div内部的所有内容（包括标签）的字符串表示
+                        inner_content = str(vsb_content_div)
+                        inner_content = patternDrop.sub('', inner_content)
+
+                        inner_content = patternStrong.sub('', inner_content)
+                        if inner_content != '':
+                            content.append(inner_content)
+
+                        dict['url'] = newUrl
+                        dict['content'] = content
+                        dict['title'] = title
+                        dict['date'] = lastmodify
+                        insertInfo(dict)
+                        addGotted(newUrl)
+                        dics.append(dict)
+                        print(dict)
+                    else:
+                        print("页面出错")
             i += 1
+        addGotted(finUrl)
     return dics
