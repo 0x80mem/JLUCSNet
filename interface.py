@@ -8,27 +8,31 @@ import Scisearch
 import TeachersInfo
 import TestCenter
 import time
-
+from checkUrl import clearGotted
 INITIAL_INTERVAL = 1
 MAX_ATTEMPTS = 3
 
+
+
+
 def insertInfo(info):
-    print(info)
-def getData():
+    print("存储成功！")
+
+
+def getData(insertInfo):
     works = [Recuit.work, CollegeInfo.work, Construct.work, Party.work, PerTraining.work, PublicNote.work,
-            Scisearch.work, TeachersInfo.work, TestCenter.work]
-    #dics = []
+             Scisearch.work, TeachersInfo.work, TestCenter.work]
     for work in works:
-        #dics.append(catchWork(work))
-        insertInfo(catchWork(work))#获得的每页内容直接存储
+        catchWork(work, insertInfo)
 
 
-def catchWork(work, interval=INITIAL_INTERVAL, attempts=MAX_ATTEMPTS):
+def catchWork(work, insertInfo, interval=INITIAL_INTERVAL, attempts=MAX_ATTEMPTS):
     try:
-        data = work()
+        data = work(insertInfo)
+        clearGotted()
         interval /= 2
         return data
-    except :
+    except:
         print("网络波动，连接失败！")
         if attempts > 0:
             print(f"重试中...，剩余尝试次数: {attempts}")
@@ -38,4 +42,8 @@ def catchWork(work, interval=INITIAL_INTERVAL, attempts=MAX_ATTEMPTS):
             print("已达到最大尝试次数")
             return None
 
-getData()
+
+
+
+
+getData(insertInfo)
