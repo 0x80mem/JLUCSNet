@@ -8,7 +8,7 @@ import re
 import pytesseract
 import io
 import OCRFunction
-
+from history import History
 def work():
     urlIntro = "https://ccst.jlu.edu.cn/xygk/xyjj.htm"
     urlMessage = "https://ccst.jlu.edu.cn/xygk/yzjy.htm"
@@ -53,8 +53,8 @@ def work():
                     if div.text != '':
                         content.append(div.text)
                 if t == 2:
-
-                    match = patternImg.finditer(resp.text)
+                    content.append(History())
+                    '''match = patternImg.finditer(resp.text)
 
                     for it in match:
 
@@ -69,7 +69,7 @@ def work():
                                 content.append(text)
                                 imageData.close()
                         else:
-                            break
+                            break'''
             key = urls[t]
             dict['url'] = urls[t]
             dict['title'] = title
@@ -77,11 +77,11 @@ def work():
             dict['date'] = lastmodify
             dics.append(dict)
             print(dics)
-            t+=1
+            t += 1
 
         else:
             print("页面不存在")
-            t+=1
+            t += 1
 
     return dics
 
