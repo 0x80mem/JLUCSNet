@@ -76,31 +76,34 @@ def work():
                 # print(newUrl)
                 # 下面对这个newUrl进行访问，并获取文章内容
                 resp2 = requests.get(newUrl)
-                resp2_headers = resp2.headers
-                lastmodify = resp2_headers.get('Last-Modified')
-                html2 = etree.HTML(resp2.content)
-                titles = html2.xpath(titlexpath)
-                for e in titles:
-                    title = e.text  # 获取标题
+                if resp2.status_code == 200:
+                    resp2_headers = resp2.headers
+                    lastmodify = resp2_headers.get('Last-Modified')
+                    html2 = etree.HTML(resp2.content)
+                    titles = html2.xpath(titlexpath)
+                    for e in titles:
+                        title = e.text  # 获取标题
 
-                soup = BeautifulSoup(resp2.content, 'html.parser')
+                    soup = BeautifulSoup(resp2.content, 'html.parser')
 
-                # 找到id为vsb_content的div标签
-                vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
+                    # 找到id为vsb_content的div标签
+                    vsb_content_div = soup.find('div', id=['vsb_content', 'vsb_content_100'])
 
-                # 获取该div内部的所有内容（包括标签）的字符串表示
-                inner_content = str(vsb_content_div)
-                inner_content = patternDrop.sub('', inner_content)
+                    # 获取该div内部的所有内容（包括标签）的字符串表示
+                    inner_content = str(vsb_content_div)
+                    inner_content = patternDrop.sub('', inner_content)
 
-                inner_content = patternStrong.sub('', inner_content)
-                if inner_content != '':
-                    content.append(inner_content)
+                    inner_content = patternStrong.sub('', inner_content)
+                    if inner_content != '':
+                        content.append(inner_content)
 
-                dict['url'] = newUrl
-                dict['content'] = content
-                dict['title'] = title
-                dict['date'] = lastmodify
-                dics.append(dict)
-                print(dics)
+                    dict['url'] = newUrl
+                    dict['content'] = content
+                    dict['title'] = title
+                    dict['date'] = lastmodify
+                    dics.append(dict)
+                    print(dics)
+                else:
+                    print("页面出错")
             i += 1
     return dics
