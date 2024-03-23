@@ -11,8 +11,7 @@ import pytesseract
 import io
 import OCRFunction
 
-
-def work():
+def work(insertInfo):
     url = "https://ccst.jlu.edu.cn/szdw/bssds.htm"
     urlPr = "https://ccst.jlu.edu.cn/szdw/js.htm"
     urlVicePr = "https://ccst.jlu.edu.cn/szdw/fjs.htm"
@@ -225,6 +224,7 @@ def work():
                 memberInfo = strLine#+image_bytes
                 print(memberInfo)
                 members.append((div.text,memberInfo))
+                insertInfo(memberInfo)
             i += 1
         t += 1
 
