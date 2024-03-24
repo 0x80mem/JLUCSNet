@@ -1,4 +1,9 @@
 roleInfo = {
-    'You': './img/avatar.jpg',
-    'ChatGPT': './img/chatGPT.png'
+    'User': './img/avatar.jpg',
+    'AI': './img/chatGPT.png',
+    'System': './img/chatGPT.png',
+    'DataBase': './img/chatGPT.png',
+}
+roleMessageCSS = {
+
 }

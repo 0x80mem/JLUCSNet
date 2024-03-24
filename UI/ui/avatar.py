@@ -2,9 +2,11 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui import QPainter, QPixmap, QBrush, QColor
 from PyQt5.QtCore import Qt
 
+
 class AvatarLabel(QLabel):
-    def __init__(self, image_path,parent=None):
+    def __init__(self, image_path, parent=None):
         super().__init__(parent)
+        self.image_path = None
         self.setScaledContents(True)
         self.setAvatar(image_path)
 
@@ -31,4 +33,4 @@ class AvatarLabel(QLabel):
         # 设置圆形头像到QLabel中显示
         self.setPixmap(circle_image)
 
-        self.setFixedSize(50,50)
+        self.setFixedSize(50, 50)

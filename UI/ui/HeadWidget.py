@@ -3,8 +3,10 @@ from PyQt5.QtWidgets import QWidget
 
 
 class HeadWidget(QWidget):
+
     def __init__(self, parent=None, mainWindow=None):
         super().__init__()
+        self.drag_pos = None
         self.setParent(parent)
         self.setWindowTitle('')
         self.mainWindow = mainWindow
@@ -15,6 +17,7 @@ class HeadWidget(QWidget):
             event.accept()
 
     def mouseMoveEvent(self, event):
+
         if event.buttons() == Qt.LeftButton:
             self.mainWindow.move(event.globalPos() - self.drag_pos)
             event.accept()
