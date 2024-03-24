@@ -37,7 +37,7 @@ def catchWork(work, insertInfo, interval=INITIAL_INTERVAL, attempts=MAX_ATTEMPTS
         if attempts > 0:
             print(f"重试中...，剩余尝试次数: {attempts}")
             time.sleep(interval)
-            return catchWork(work, interval * 2, attempts - 1)
+            return catchWork(work, insertInfo,interval * 2, attempts - 1)
         else:
             print("已达到最大尝试次数")
             return None
