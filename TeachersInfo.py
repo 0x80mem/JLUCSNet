@@ -233,7 +233,7 @@ def work(insertInfo):
                 #print(memberInfo)
                 dict['url'] = newUrl
                 dict['title'] = div.text
-                dict['content'] = strLine
+                dict['content'] = [strLine]
                 dict['date'] = lastmodify
                 insertInfo(dict)
                 print(dict)
