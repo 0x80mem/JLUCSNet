@@ -73,6 +73,12 @@ def work(insertInfo):
         i = 2
 
         while i != 18:
+            dict = {
+                'url': [],
+                'title': [],
+                'content': [],
+                'date': []
+            }
             xpaths = [f'/html/body/div[3]/div[2]/div[2]/div[2]/p[{i}]/a',
                       f'/html/body/div[3]/div[2]/div[2]/div[1]/p[{i}]/a',
                       f'/html/body/div[3]/div[2]/div[2]/div[1]/p[{i}]/a',
@@ -90,6 +96,8 @@ def work(insertInfo):
 
                 newNames.append(div.text)
                 resp2 = requests.get(newUrl)
+                resp2_headers = resp2.headers
+                lastmodify = resp2_headers.get('Last-Modified')  # 获取最后修改时间
                 resp2.encoding = 'UTF-8'
                 html2 = etree.HTML(resp2.content)
                 texts = []
@@ -222,9 +230,14 @@ def work(insertInfo):
                 #dictionTea[div.text] = strLine
                 strLine = patternDropImage.sub('',strLine)
                 memberInfo = strLine#+image_bytes
-                print(memberInfo)
+                #print(memberInfo)
+                dict['url'] = newUrl
+                dict['title'] = div.text
+                dict['content'] = strLine
+                dict['date'] = lastmodify
+                insertInfo(dict)
+                print(dict)
                 members.append((div.text,memberInfo))
-                insertInfo(memberInfo)
             i += 1
         t += 1
 
@@ -248,4 +261,4 @@ def work(insertInfo):
 
         # 输出语义分析结果
     print("语义分析结果：", result)'''
-    return members
+    return dict
