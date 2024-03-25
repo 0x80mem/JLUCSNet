@@ -7,6 +7,7 @@ class InputTextEdit(QTextEdit):
         super().__init__()
         self.setParent(parent)
         self.send_fn = None
+        self.setAttribute(Qt.WA_StyledBackground, True)
 
     def keyPressEvent(self, event):
 

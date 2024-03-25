@@ -1,19 +1,23 @@
 # 主窗口
+from PyQt5.QtWidgets import QLineEdit
+
 mainWindow = \
     '''
     MainWindow{
         background-color:rgb(33,33,33);
         border: 2px solid rgb(50,50,50);
+        padding: 10px;
     } 
     '''
 # 标题栏
 head_widget = \
     '''
-    QWidget { 
+    QWidget#head_widget{ 
         background-color: rgb(50,50,50); 
         border-left: 2px solid rgb(50,50,50);
         border-right: 2px solid rgb(50,50,50);
     }
+
     '''
 # 标题栏按钮widget
 head_btn_widget = \
@@ -26,10 +30,14 @@ head_btn_widget = \
     }
     '''
 # 退出按钮
-exitBtn = \
+exit_btn = \
     '''
     QPushButton{
         border-image:url(./img/close1.png);
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius:10px;
     }
     QPushButton::hover{
         border-image:url(./img/close2.png);
@@ -37,20 +45,28 @@ exitBtn = \
    
     '''
 # 最小化按钮
-minBtn = \
+min_btn = \
     '''
     QPushButton{
         border-image:url(./img/minus1.png);
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius:10px;
     }
     QPushButton::hover{
         border-image:url(./img/minus2.png);
     }
     '''
 # 还原/最大化按钮
-restore_btn = \
+resize_btn = \
     '''
     QPushButton{
         border-image:url(./img/restore1.png);
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius:10px;
     }
     QPushButton::hover{
         border-image:url(./img/restore2.png);
@@ -58,7 +74,7 @@ restore_btn = \
     
     '''
 # 显示窗口
-chat_widget = \
+view_widget = \
     '''
     QWidget#chat_widget{
         background-color:rgb(33,33,33);
@@ -67,15 +83,15 @@ chat_widget = \
     }
     '''
 # 滚动区域滚动条样式
-chat_area_verticalScrollBar = \
+verticalScrollBar = \
     '''
     QScrollBar:vertical {
+        border-radius:30px;
         background: rgb(50,50,50);
-        width: 15px;  
-        border-right: 2px solid rgb(50,50,50)
+        width: 13px;  
     }
     QScrollBar::handle:vertical {
-        background: transparent; 
+        background: transparent;
         min-height: 20px;  
     }
     QScrollBar::add-line:vertical {
@@ -119,10 +135,18 @@ send_button = \
         margin-bottom:20px;
     }
     '''
+# 输入widget
+input_widget = \
+    '''
+    QWidget#input_widget {
+        background-color:rgb(33,33,33);
+    }
+    
+    '''
 # 输入框
 input_edit = \
     '''
-    QTextEdit#inputEdit{
+    QTextEdit#input_edit{
         font-family:微软雅黑;
         letter-spacing:3px;
         color:rgb(200, 200,200);
@@ -141,7 +165,8 @@ UserMsgBrowser = \
     '''
     QTextBrowser{
         background-color:rgb(33, 33, 33);
-        margin-left:80px
+        margin-left:80px;
+        color:red;
     }      
     '''
 UserMsgBrowser_html_p = \

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout, QTextEdit, QGridLayout, QTextBrowser
 from ui.roleInfo import roleInfo
 from ui.Avatar import AvatarLabel
@@ -6,11 +6,12 @@ import ui.MsgBrowser as msgBrs
 
 
 class Message(QWidget):
-    def __init__(self, text, role="User", parent=None ):
+    def __init__(self, text, role="User", parent=None):
         super().__init__(parent)
         self.msg_browser = None
         self.parent = parent
         self.setParent(parent)
+
 
         layout = QVBoxLayout(self)
 
@@ -47,7 +48,14 @@ class Message(QWidget):
         # # 添加红色边框样式
         # self.setStyleSheet("border: 2px solid red;")
 
+        # 一个奇怪的BUG 不为本组件设置border 则msg_browser的样式不能正确显示
+        self.setStyleSheet("border: 0px")
+
+
     # 根据主窗口变化更新组件size
+    # def resizeEvent(self, a0):
+    #     self.update_size()
+
     def update_size(self):
 
         # 设置主Widget和msg_browser宽度

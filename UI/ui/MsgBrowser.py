@@ -1,5 +1,5 @@
-import markdown
 import markdown2
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtWidgets import QTextBrowser
 import ui.StyleSheet as qss
@@ -10,6 +10,7 @@ class UserMsgBrowser(QTextBrowser):
         super().__init__()
         self.setParent(parent)
         self.setStyleSheet(qss.UserMsgBrowser)
+        self.setAttribute(Qt.WA_StyledBackground, True)
 
     def setText(self, text):
         text = qss.UserMsgBrowser_html_p + text + "</p>"
@@ -24,11 +25,9 @@ class AIMsgBrowser(QTextBrowser):
 
     def setText(self, text):
         html = qss.AIMsgBrowser_html
-        from test.hd import process_markdown
-        # md = process_markdown(text)
-        md =  markdown2.markdown(text, extras=["fenced-code-blocks"])
-        # print(md)
-        # print(markdown.markdown(text))
+
+        md = markdown2.markdown(text, extras=["fenced-code-blocks"])
+
         md = md.replace("<pre><code>", """</p><table><tr><th width=100%>""")
         md = md.replace("</code></pre>", "</th></tr></table>")
         html_text = html + md + \
@@ -51,17 +50,6 @@ class SystemMsgBrowser(QTextBrowser):
         super().setText(text)
 
 
-class DataMsgBrowser(QTextBrowser):
-    def __init__(self, parent):
-        super().__init__()
-        self.setParent(parent)
-        self.setStyleSheet(qss.DataBaseMsgBrowser)
-
-    def setText(self, text):
-        text = qss.SystemMsgBrowser_html_p + text + "</p>"
-        super().setText(text)
-
-
 class DataBaseMsgBrowser(QTextBrowser):
     def __init__(self, parent):
         super().__init__()
@@ -75,8 +63,8 @@ class DataBaseMsgBrowser(QTextBrowser):
         QDesktopServices.openUrl(url)
 
     def setText(self, data_list):
-        # from ui.TestDocument import Database_test_list
-        # data_list = Database_test_list
+        from ui.TestDocument import Database_test_list
+        data_list = Database_test_list
         html = qss.DataBaseMsgBrowser_html
         '''
                     -list

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtGui import QEnterEvent
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QEnterEvent, QColor
+from PyQt5.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
 
 
 class FLWindow(QMainWindow):
@@ -39,6 +39,8 @@ class FLWindow(QMainWindow):
         self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint | Qt.WindowMinimizeButtonHint
                             | Qt.WindowMaximizeButtonHint)
         self.setMouseTracking(True)
+        # 透明背景
+        self.setAttribute(Qt.WA_TranslucentBackground)
 
     def update_edge_data(self):
         height = self.height()
@@ -51,7 +53,6 @@ class FLWindow(QMainWindow):
         self.edge['lb'] = QRect(0, height - 20, 20, 20)
         self.edge['rt'] = QRect(width - 20, 0, 20, 20)
         self.edge['rb'] = QRect(width - 20, height - 20, 20, 20)
-
 
     def mouseMoveEvent(self, event):
         # print(event.x(), event.y())
@@ -73,6 +74,9 @@ class FLWindow(QMainWindow):
     # def resizeEvent(self, a0):
     #     if self.l_press is False:
     #         self.update_edge_data()
+    def mouseLeaveEvent(self, event):
+        self.direction = None
+        self.setCursor(Qt.ArrowCursor)
 
     def resize_window(self, btn=None, event=None):
 
@@ -87,6 +91,8 @@ class FLWindow(QMainWindow):
             self.windowHandle().startSystemResize(self.resize_edge[self.direction])
 
     def change_mouse_cursor(self, pos=None, event=None):
+        if self.isFullScreen():
+            return
         # 作为槽函数时使用pos
         if pos is None:
             pos = event.pos()
@@ -109,13 +115,14 @@ class FLWindow(QMainWindow):
             self.direction = None
             self.setCursor(Qt.ArrowCursor)
 
+        # 事件过滤器, 鼠标进入其它控件后还原为标准鼠标样式, 方向属性变为None
+
     def eventFilter(self, obj, event):
 
         if isinstance(event, QEnterEvent):
             self.setCursor(Qt.ArrowCursor)
             self.direction = None
         return super().eventFilter(obj, event)
-
 
 #
 # if __name__ == '__main__':

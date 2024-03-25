@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QPainter
+from PyQt5.QtWidgets import QWidget, QStyleOption, QStyle
 
 
 class HeadWidget(QWidget):
@@ -10,6 +11,8 @@ class HeadWidget(QWidget):
         self.setParent(parent)
         self.setWindowTitle('')
         self.mainWindow = mainWindow
+        self.setAttribute(Qt.WA_StyledBackground,True)
+        self.setStyleSheet("background-color:black;")
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -19,5 +22,7 @@ class HeadWidget(QWidget):
     def mouseMoveEvent(self, event):
 
         if event.buttons() == Qt.LeftButton:
+            self.setCursor(Qt.ArrowCursor)
             self.mainWindow.move(event.globalPos() - self.drag_pos)
             event.accept()
+

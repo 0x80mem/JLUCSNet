@@ -1,9 +1,9 @@
 class Document:
     def __init__(self):
-        self.page_content = "Test Content 测试文档内容"*100
-        self.meta_data = {
+        self.page_content = """🦖 Test Document 测试文档 🦖 """ *100
+        self.metadata = {
             "title": "Test Title 测试标题",
-            "url": "www.baidu.com",
+            "url": "dwadwad",
             "date": "Test date",
         }
 
@@ -21,11 +21,12 @@ class Document:
 
     '''
 Database_test_list = (
-    (Document(), "0.85"),
-    (Document(), "0.75"),
-    (Document(), "0.65")
+    (Document(), 0.85),
+    (Document(), 0.75),
+    (Document(), 0.65)
 )
-AI_test = """
+AI_test = \
+ """
 以下是使用 C++ 编写的 "Hello, World!" 程序：
 
 ```
