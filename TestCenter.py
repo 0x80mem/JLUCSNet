@@ -33,7 +33,7 @@ def work(insertInfo):
     t = 0
     dics = []
     titlexpath = '/html/head/title[1]'
-    while t != 10:
+    while t != 9:
         dict = {
             'url': [],
             'title': [],
@@ -98,7 +98,7 @@ def work(insertInfo):
             for es in titles:
                 title = es.text
 
-            dict['url'] = urls[t]
+            dict['url'] = urls2[t]
             dict['title'] = title
             insertInfo(dict)
             dics.append(dict)
