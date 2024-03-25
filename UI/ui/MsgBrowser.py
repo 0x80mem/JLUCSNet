@@ -93,13 +93,13 @@ class DataBaseMsgBrowser(QTextBrowser):
         for data_tuple in data_list:
             # 拆解数据
             doc = data_tuple[0]
-            meta_data = doc.meta_data
+            meta_data = doc.metadata
             doc_data = {
                 'title': meta_data.get('title') if meta_data.get('title') is not None else '',
                 'content': doc.page_content,
                 'url': meta_data.get('url') if meta_data.get('url') is not None else '',
                 'date': '时间：' + meta_data.get('date') if meta_data.get('date') is not None else '',
-                'comp_ratio': '文档契合度：' + data_tuple[1]
+                'comp_ratio': '文档契合度：' + str(data_tuple[1])
             }
             if doc_data.get('url') is not None:
                 doc_data['url'] = '''<a href="''' + doc_data['url'] + '''">''' + doc_data['url'] + '''</a>'''
