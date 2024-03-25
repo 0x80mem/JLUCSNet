@@ -128,7 +128,7 @@ def work(insertInfo):
                 print("页面出错")
                 t += 1
 
-    content = []
+    
     r = 1
 
     tdXpath = './a'
@@ -151,6 +151,7 @@ def work(insertInfo):
                     for it in nextdiv:
                         NewUrl = prelog + it.get('href')[2:]  # 这样就获得了一门课程的url连接
                         print(NewUrl)
+                        content = []
                         #下面可以进入到连接中爬取数据
                         if findGotted(NewUrl) == -1:
                             continue
