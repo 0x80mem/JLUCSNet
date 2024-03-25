@@ -87,7 +87,7 @@ class DataBaseMsgBrowser(QTextBrowser):
                 'content': doc.page_content,
                 'url': meta_data.get('url') if meta_data.get('url') is not None else '',
                 'date': '时间：' + meta_data.get('date') if meta_data.get('date') is not None else '',
-                'comp_ratio': '文档契合度：' + str(data_tuple[1])
+                'comp_ratio': '文档契合度：' + str(data_tuple[1].item())
             }
             if doc_data.get('url') is not None:
                 doc_data['url'] = '''<a href="''' + doc_data['url'] + '''">''' + doc_data['url'] + '''</a>'''
