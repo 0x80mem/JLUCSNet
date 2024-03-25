@@ -4,6 +4,7 @@ from sqlalchemy.sql import text
 import urllib.parse
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import re
 
 import os
 os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
@@ -27,7 +28,7 @@ class SQLDAO:
         self.session = self.Session()
 
         self.embeddings = HuggingFaceEmbeddings(
-            model_name='thenlper/gte-base-zh', 
+            model_name='aspire/acge_text_embedding', 
             model_kwargs= {'device': device}, 
             encode_kwargs = {'normalize_embeddings': True})
         if os.path.exists("faiss_db"):
@@ -36,42 +37,46 @@ class SQLDAO:
             self.vector_store = None
 
     def insertInfo(self, info):
-        for page in info:
-            url = page['url']
-            title = page['title']
-            contents = page['content']
-            if len(contents) == 0:
-                contents = [title]
-                date = datetime.now()
-            else:
-                date = page['date']
-                date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+        #for page in info:
+        page = info
+        url = page['url']
+        title = page['title']
+        contents = page['content']
+        if len(contents) == 0:
+            contents = [title]
+            date = datetime.now()
+        else:
+            date = page['date']
+            date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
 
-            self.session.merge(Page(url=url, title=title, date=date))
-            self.session.commit()
+        self.session.merge(Page(url=url, title=title, date=date))
+        self.session.commit()
 
-            for i, lcontent in enumerate(contents):
-                for content in RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=128).split_text(lcontent):
-                    self.session.merge(Content(url=url, start_paragraph=i, content=content))
-                    self.session.commit()
+        for i, lcontent in enumerate(contents):
+            lcontent = re.sub(r'<[^>]*>', '', lcontent)
+            lcontent = re.sub(r'[^\S\n]+', ' ', lcontent)
+            lcontent = re.sub(r'\s*\n\s*', '\n', lcontent)
+            for content in RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=128).split_text(lcontent):
+                self.session.merge(Content(url=url, start_paragraph=i, content=content))
+                self.session.commit()
 
-                    text_splitter = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=64)
-                    texts = text_splitter.split_text(content)
-                    if self.vector_store is None:
-                        self.vector_store = FAISS.from_texts(
-                            texts=texts,
-                            embedding=self.embeddings,
-                            metadatas=[{"url": url, "date": page['date'], "title": title} for _ in range(len(texts))],
-                        )
-                    else:
-                        for i, text in enumerate(texts):
-                            res = self.vector_store.similarity_search_with_relevance_scores(text, k=1)
-                            if res is None or res[0][1] < 1:
-                                self.vector_store.merge_from(FAISS.from_texts(
-                                    texts=[text],
-                                    embedding=self.embeddings,
-                                    metadatas=[{"date": page['date']}]
-                                ))
+                texts = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=32).split_text(content)
+                print(texts)
+                if self.vector_store is None:
+                    self.vector_store = FAISS.from_texts(
+                        texts=[f"{title}:\n...\n{text}\n..." for text in texts],
+                        embedding=self.embeddings,
+                        metadatas=[{"url": url, "date": page['date'], "title": title} for _ in range(len(texts))],
+                    )
+                else:
+                    for i, text in enumerate(texts):
+                        res = self.vector_store.similarity_search_with_relevance_scores(text, k=1)
+                        if res is None or res[0][1] < 0.99:
+                            self.vector_store.merge_from(FAISS.from_texts(
+                                texts=[f"{title}:\n...\n{text}\n..."],
+                                embedding=self.embeddings,
+                                metadatas=[{"url": url, "date": page['date'], "title": title}]
+                            ))
         self.vector_store.save_local("faiss_db")
 
     def searchWithRelevanceScores(self, query: str, k: int = 5):

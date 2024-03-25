@@ -6,31 +6,46 @@ import threading
 import time
 import torch
 
-llm = LLMChat()
-_window = None
-def gpt_slot(query):
-    global llm
-    _window.gpt_mutex.acquire()
+class Chat:
+    def __init__(self, llm):
+        self.llm = llm
+        self.mutex = threading.Lock()
 
-    try:
+    def getRevalentDocs(self, query):
+        self.mutex.acquire()
         torch.cuda.empty_cache()
-        docs = llm.getDocs(query)
-        _window.display_message(str(docs), role="ChatGPT")
-        output = llm.getResponse(query)
-        # _window.display_message(str(query), role="You")
-        _window.display_message(str(output), role="ChatGPT")
-    except Exception as e:
+        try:
+            docs = self.llm.getDocs(query)
+            for doc in docs:
+                doc[0].page_content = doc[0].page_content[len(doc[0].metadata['title']) + 2:]
+        except Exception as e:
+            torch.cuda.empty_cache()
+            docs = str(e)
         torch.cuda.empty_cache()
-        _window.display_message(str(e), role="ChatGPT")
-    time.sleep(3)
-    torch.cuda.empty_cache()
-    _window.gpt_mutex.release()
+        self.mutex.release()
+        return docs
+    
+    def getResponse(self, query):
+        self.mutex.acquire()
+        torch.cuda.empty_cache()
+        try:
+            output = self.llm.getResponse(query)
+        except Exception as e:
+            torch.cuda.empty_cache()
+            output = str(e)
+        torch.cuda.empty_cache()
+        self.mutex.release()
+        return output
+
+    def gpt_slot(self, input):
+        return (self.getRevalentDocs(input), "DataBase"), (self.getResponse(input), "AI")
+        
 
 if __name__ == '__main__':
     llm = LLMChat()
     app = QApplication(sys.argv)
-    window = mainWindow.MainWindow(gpt_slot = gpt_slot)
-    window.gpt_mutex = threading.Lock()
-    _window = window
+    chat = Chat(llm)
+    window = mainWindow.MainWindow(gpt_slot = chat.gpt_slot)
+    chat.window = window
     window.show()
     sys.exit(app.exec_())
