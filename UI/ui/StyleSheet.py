@@ -211,6 +211,9 @@ AIMsgBrowser_html = \
         <head>
             <title>HTML Table Example</title>
             <style>
+                html{
+                    font:27px;
+                }
                 a:link{
                     color: rgb(50, 200, 50);
                 }
