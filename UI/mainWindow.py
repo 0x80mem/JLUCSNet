@@ -2,7 +2,7 @@ import sys
 from time import sleep
 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QPushButton
+from PyQt5.QtWidgets import QApplication, QPushButton, QDesktopWidget
 from ui.MainWindow import Ui_MainWindow
 from ui.FLWindow import FLWindow
 import ui.StyleSheet as qss
@@ -40,6 +40,17 @@ class NWindow(FLWindow):
         self.setMouseTracking(True)  # 启用鼠标跟踪
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # 获取屏幕大小
+        screen = QDesktopWidget().screenGeometry()
+        screen_width, screen_height = screen.width(), screen.height()
+
+        # 设置窗口大小为屏幕大小的百分之70
+        window_width = int(screen_width * 0.7)
+        window_height = int(screen_height * 0.7)
+        self.setGeometry((screen_width - window_width) // 2, (screen_height - window_height) // 2, window_width,
+                         window_height)
+
         # self.setStyleSheet("background-color:red;")
 
         # 发送按钮
@@ -120,11 +131,13 @@ class NWindow(FLWindow):
 
     def change_restore(self):
         if self.restore == 0:
-            self.showFullScreen()
+            self.showMaximized()
             self.restore = 1
+            self.ui.resize_btn.setStyleSheet(qss.resize_btn)
         else:
             self.showNormal()
             self.restore = 0
+            self.ui.resize_btn.setStyleSheet(qss.max_btn)
 
     def get_reply(self, result):
         self.display_message(result[0][0], result[0][1])
