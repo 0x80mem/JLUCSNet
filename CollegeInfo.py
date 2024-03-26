@@ -8,7 +8,7 @@ import re
 import pytesseract
 import io
 import OCRFunction
-from histroy import History
+from history import History
 from checkUrl import addGotted
 from checkUrl import findGotted
 def work(insertInfo):
