@@ -58,7 +58,7 @@ min_btn = \
         border-image:url(./img/minus2.png);
     }
     '''
-# 还原/最大化按钮
+# 还原按钮
 resize_btn = \
     '''
     QPushButton{
@@ -72,6 +72,21 @@ resize_btn = \
         border-image:url(./img/restore2.png);
     }
     
+    '''
+# 最大化按钮
+max_btn = \
+    '''
+    QPushButton{
+        border-image:url(./img/max.png);
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius:10px;
+    }
+    QPushButton::hover{
+        border-image:url(./img/max2.png);
+    }
+
     '''
 # 显示窗口
 view_widget = \
@@ -164,20 +179,20 @@ input_edit = \
 UserMsgBrowser = \
     '''
     QTextBrowser{
-        background-color:rgb(33, 33, 33);
         margin-left:80px;
-        color:red;
+        background-color:rgb(33,33,33);
     }      
     '''
 UserMsgBrowser_html_p = \
     '''
     <p style='
+        padding-left:0px;
         font-family:微软雅黑;
         font:27px;
         color:rgb(240, 240, 240);
         line-height:20px;
-        width:100% ; white-space:
-        pre-wrap; letter-spacing: 3px
+        width:100% ;
+        letter-spacing: 3px
     '>  
     '''
 # AIMsgBrowser
