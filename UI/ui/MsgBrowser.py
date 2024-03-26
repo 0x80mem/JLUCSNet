@@ -63,8 +63,10 @@ class DataBaseMsgBrowser(QTextBrowser):
         QDesktopServices.openUrl(url)
 
     def setText(self, data_list):
-        from ui.TestDocument import Database_test_list
-        data_list = Database_test_list
+        # # 开启测试文档
+        # from ui.TestDocument import Database_test_list
+        # data_list = Database_test_list
+        
         html = qss.DataBaseMsgBrowser_html
         '''
                     -list
