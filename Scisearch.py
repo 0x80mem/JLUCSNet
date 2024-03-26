@@ -35,12 +35,13 @@ def work(insertInfo):
     patternStrong = re.compile(r'<strong[^>]*>', re.S)
     dics = []
     titlexpath = '/html/head/title[1]'
-    while t != 5:
+    while t != 3:
         dict = {
             'url': [],
             'title': [],
             'content': [],
-            'date': []
+            'date': [],
+            'realtime':''
         }
         pagexpath = '/html/body/div[3]/div[2]/div[2]/div[1]/span[1]'
         if findGotted(urls[t]) == -1:  # 说明此页面已经访问过，则不需要访问
@@ -87,6 +88,11 @@ def work(insertInfo):
                     i = 1
                     while i != 11:
                         rowxpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/a[1]'  # 获取连接用的xpath
+                        rowdatexpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/span[1]'#用于获取真正的时间
+                        timeDivs = html.xpath(rowdatexpath)
+                        for timeDiv in timeDivs:
+                            realTime = timeDiv.text
+                            dict['realtime'] = realTime
                         divs = html.xpath(rowxpath)  # 对HTML进行xpath解析（这一页包含很多li）
                         for div in divs:
                             content = []
@@ -140,6 +146,46 @@ def work(insertInfo):
                 print("页面出错")
 
         t += 1
+
+
+    t = 3
+    while t != 5:
+        dict = {
+            'url': [],
+            'title': [],
+            'content': [],
+            'date': []
+        }
+        if findGotted(urls[t]) == -1:  # 说明此页面已经访问过，则不需要访问
+            t += 1
+        else:
+            resp = requests.get(urls[t])
+            if resp.status_code == 200:
+                resp_headers = resp.headers  # 获取头部信息
+                lastmodify = resp_headers.get('Last-Modified')  # 获取最后修改时间
+                html3 = etree.HTML(resp.content)
+                res = html3.xpath(titlexpath)
+                for rs in res:
+                    title = rs.text
+                soup = BeautifulSoup(resp.content,'html.parser')
+                vsb_content_div = soup.find('div',id=['vsb_content','vsb_content_100','vsb_content_2'])
+
+                inner_content = str(vsb_content_div)
+                inner_content = patternDrop.sub('', inner_content)
+                inner_content = patternStrong.sub('', inner_content)
+                if inner_content != '':
+                    content.append(inner_content)
+                dict['url'] = newUrl
+                dict['content'] = content
+                dict['title'] = title
+                dict['date'] = lastmodify
+                dics.append(dict)
+                insertInfo(dict)
+                addGotted(newUrl)
+                print(dict)
+            else:
+                print('页面出错')
+            t += 1
     return dics
 
 
