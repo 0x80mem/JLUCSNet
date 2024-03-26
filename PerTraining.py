@@ -35,9 +35,11 @@ def work(insertInfo):
             'url': [],
             'title': [],
             'content': [],
-            'date': []
+            'date': [],
+            'realtime':''
         }
         pagexpath = '/html/body/div[3]/div[2]/div[2]/div[1]/span[1]'
+
         if findGotted(urls[t]) == -1:
             t += 1
             continue
@@ -82,6 +84,11 @@ def work(insertInfo):
                     i = 1
                     while i != 11:
                         rowxpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/a[1]'  # 获取连接用的xpath
+                        rowdatexpath = f'/html/body/div[3]/div[2]/div[2]/ul[1]/li[{i}]/span[1]'  # 用于获取真正的时间
+                        timeDivs = html.xpath(rowdatexpath)
+                        for timeDiv in timeDivs:
+                            realTime = timeDiv.text
+                            dict['realtime'] = realTime
                         divs = html.xpath(rowxpath)  # 对HTML进行xpath解析（这一页包含很多li）
                         for div in divs:
                             content = []
@@ -128,7 +135,7 @@ def work(insertInfo):
                 print("页面出错")
                 t += 1
 
-    
+
     r = 1
 
     tdXpath = './a'
