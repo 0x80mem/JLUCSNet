@@ -16,9 +16,5 @@ import interface
 def buildSQL():
     sql = SQLDAO(sqlConnection['url'], sqlConnection['user'], sqlConnection['password'])
     sql.clearAll()
-    works = [Recuit.work, CollegeInfo.work, Construct.work, Party.work, PerTraining.work, PublicNote.work,
-            Scisearch.work, TeachersInfo.work, TestCenter.work]
-    for work in works:
-        sql.insertInfo(interface.catchWork(work))
-
+    interface.getData(sql.insertInfo)
 buildSQL()
