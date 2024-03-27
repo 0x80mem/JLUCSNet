@@ -4,6 +4,7 @@ from sqlalchemy.sql import text
 import urllib.parse
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import numpy as np
 import re
 
 import os
@@ -48,23 +49,31 @@ class SQLDAO:
         else:
             date = page['date']
             date = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S %Z')
+            if 'realtime' in page:
+                date = datetime.strptime(page['realtime'], '%Y-%m-%d')
+                page['date'] = page['realtime']
 
         self.session.merge(Page(url=url, title=title, date=date))
         self.session.commit()
 
         for i, lcontent in enumerate(contents):
-            lcontent = re.sub(r'<[^>]*>', '', lcontent)
+            lcontent = re.sub(r'<[^>]*>', ' ', lcontent)
             lcontent = re.sub(r'[^\S\n]+', ' ', lcontent)
             lcontent = re.sub(r'\s*\n\s*', '\n', lcontent)
-            for content in RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=128).split_text(lcontent):
+            lcontents = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=128).split_text(lcontent)
+            if len(lcontent) > 1024:
+                lcontents.append(lcontent[-1024:])
+            for content in lcontents:
                 self.session.merge(Content(url=url, start_paragraph=i, content=content))
                 self.session.commit()
 
                 texts = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=32).split_text(content)
-                print(texts)
+                if len(content) > 256:
+                    texts.append(content[-256:])
+                # print(texts)
                 if self.vector_store is None:
                     self.vector_store = FAISS.from_texts(
-                        texts=[f"{title}:\n...\n{text}\n..." for text in texts],
+                        texts=[f"{title} {page['date']}:{text}" for text in texts],
                         embedding=self.embeddings,
                         metadatas=[{"url": url, "date": page['date'], "title": title} for _ in range(len(texts))],
                     )
@@ -73,14 +82,15 @@ class SQLDAO:
                         res = self.vector_store.similarity_search_with_relevance_scores(text, k=1)
                         if res is None or res[0][1] < 0.99:
                             self.vector_store.merge_from(FAISS.from_texts(
-                                texts=[f"{title}:\n...\n{text}\n..."],
+                                texts=[f"{title} {page['date']}:{text}"],
                                 embedding=self.embeddings,
                                 metadatas=[{"url": url, "date": page['date'], "title": title}]
                             ))
         self.vector_store.save_local("faiss_db")
 
     def searchWithRelevanceScores(self, query: str, k: int = 5):
-        return self.vector_store.similarity_search_with_relevance_scores(query, k=k)
+        embedding = self.embeddings.embed_query(query)
+        return self.vector_store.max_marginal_relevance_search_with_score_by_vector(embedding, k=k)
     
     def getEngine(self):
         return self.engine

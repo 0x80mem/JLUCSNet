@@ -17,13 +17,14 @@ class Chat:
         try:
             docs = self.llm.getDocs(query)
             for doc in docs:
-                doc[0].page_content = doc[0].page_content[len(doc[0].metadata['title']) + 2:]
+                doc[0].page_content = f"...{doc[0].page_content[len(doc[0].metadata['title']) + len(doc[0].metadata['date']) + 3:]}..."
         except Exception as e:
             torch.cuda.empty_cache()
-            docs = str(e)
+            self.mutex.release()
+            return str(e), "System"
         torch.cuda.empty_cache()
         self.mutex.release()
-        return docs
+        return (docs, "DataBase")
     
     def getResponse(self, query):
         self.mutex.acquire()
@@ -32,20 +33,21 @@ class Chat:
             output = self.llm.getResponse(query)
         except Exception as e:
             torch.cuda.empty_cache()
-            output = str(e)
+            self.mutex.release()
+            return str(e), "System"
         torch.cuda.empty_cache()
         self.mutex.release()
-        return output
+        return (output, "AI")
 
     def gpt_slot(self, input):
-        return (self.getRevalentDocs(input), "DataBase"), (self.getResponse(input), "AI")
+        return (self.getRevalentDocs(input), self.getResponse(input))
         
 
 if __name__ == '__main__':
     llm = LLMChat()
     app = QApplication(sys.argv)
     chat = Chat(llm)
-    window = mainWindow.MainWindow(gpt_slot = chat.gpt_slot)
+    window = mainWindow.NWindow(gpt_slot = chat.gpt_slot)
     chat.window = window
     window.show()
     sys.exit(app.exec_())
