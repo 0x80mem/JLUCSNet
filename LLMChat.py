@@ -22,8 +22,8 @@ class LLMChat:
         self.k = k
         self.sqldao = SQLDAO(Config.sqlConnection['url'], Config.sqlConnection['user'], Config.sqlConnection['password'], device='cpu')
         self.retriever = self.sqldao.vector_store.as_retriever(
-            search_type="similarity_score_threshold", 
-            search_kwargs={'score_threshold': 0.0, 'k': k})
+            search_type="mmr", 
+            search_kwargs={'k': k})
         self.llm = ChatGLM(
             endpoint_url=endpoint_url,
             model_kwargs={"device": "cpu"},
