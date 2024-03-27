@@ -11,6 +11,7 @@ from SQLDAO import SQLDAO
 import Config
 import torch
 import time
+import datetime
 
 endpoint_url = (
             "http://127.0.0.1:8123"
@@ -30,10 +31,10 @@ class LLMChat:
 
     def getResponse(self, query: str):
 
-        template = """你是一个吉林大学计算机科学技术学院信息帮助助手，你应当仅基于以下上下文回答问题:
-        {context}
-
-        问题: {question}
+        template = f"""你是一个吉林大学计算机科学技术学院信息帮助助手，你应当仅基于以下上下文回答问题:
+        {{context}}
+        时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        问题: {{question}}
         """
         prompt = ChatPromptTemplate.from_template(template)
 

@@ -31,7 +31,6 @@ class Chat:
     def getResponse(self, query):
         self.mutex.acquire()
         torch.cuda.empty_cache()
-        query = f"{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}: {query}"
 
         try:
             output = self.llm.getResponse(query)
