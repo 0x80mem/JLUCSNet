@@ -5,6 +5,8 @@ import sys
 import threading
 import copy
 import torch
+import time
+from datetime import datetime
 
 class Chat:
     def __init__(self, llm: LLMChat):
@@ -29,6 +31,8 @@ class Chat:
     def getResponse(self, query):
         self.mutex.acquire()
         torch.cuda.empty_cache()
+        query = f"{datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')}: {query}"
+
         try:
             output = self.llm.getResponse(query)
         except Exception as e:
