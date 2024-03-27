@@ -15,6 +15,29 @@ from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
 import os
 
+def spiltText(text, max_length=256):
+    matches = matches = [match.start() for match in re.finditer(r'[。！？；]', text)]
+    if len(matches) == 0:
+        return RecursiveCharacterTextSplitter(chunk_size=max_length, chunk_overlap=max_length//4).split_text(text)
+
+    start, end, sentence_count = 0, 0, 0
+    ret = []
+    for i, p in enumerate(matches):
+        end = p
+        sentence_count += 1
+        if end - start > 256:
+            ret.append(text[start:start+max_length])
+            start += max_length
+            sentence_count = 0
+        elif sentence_count >= 5 or i == len(matches)-1 or matches[i+1] - start > 256:
+            ret.append(text[start:end+1])
+            start = end+1
+            sentence_count = 0
+    if len(text) > max_length:
+        ret.append(text[-max_length:])
+    return ret
+    
+
 class SQLDAO:
     def __init__(self, url, username, password, device='cuda'):
         self.url = url
@@ -67,10 +90,8 @@ class SQLDAO:
                 self.session.merge(Content(url=url, start_paragraph=i, content=content))
                 self.session.commit()
 
-                texts = RecursiveCharacterTextSplitter(chunk_size=256, chunk_overlap=32).split_text(content)
-                if len(content) > 256:
-                    texts.append(content[-256:])
-                # print(texts)
+                texts = spiltText(content, max_length=200)
+                print(texts)
                 if self.vector_store is None:
                     self.vector_store = FAISS.from_texts(
                         texts=[f"{title} {page['date']}:{text}" for text in texts],
