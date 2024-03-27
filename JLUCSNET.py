@@ -3,11 +3,11 @@ from PyQt5.QtWidgets import QApplication
 from LLMChat import LLMChat
 import sys
 import threading
-import time
+import copy
 import torch
 
 class Chat:
-    def __init__(self, llm):
+    def __init__(self, llm: LLMChat):
         self.llm = llm
         self.mutex = threading.Lock()
 
@@ -15,7 +15,7 @@ class Chat:
         self.mutex.acquire()
         torch.cuda.empty_cache()
         try:
-            docs = self.llm.getDocs(query)
+            docs = copy.deepcopy(self.llm.getDocs(query))
             for doc in docs:
                 doc[0].page_content = f"...{doc[0].page_content[len(doc[0].metadata['title']) + len(doc[0].metadata['date']) + 3:]}..."
         except Exception as e:
