@@ -18,9 +18,9 @@ endpoint_url = (
         )
 
 class LLMChat:
-    def __init__(self):
+    def __init__(self, lambda_mult: float = 0.05):
         self.sqldao = SQLDAO(Config.sqlConnection['url'], Config.sqlConnection['user'], Config.sqlConnection['password'], device='cpu')
-        
+        self.lambda_mult = lambda_mult
         self.llm = ChatGLM(
             endpoint_url=endpoint_url,
             model_kwargs={"device": "cpu"},
@@ -35,7 +35,7 @@ class LLMChat:
 
         self.retriever = self.sqldao.vector_store.as_retriever(
             search_type="mmr", 
-            search_kwargs={'k': k})
+            search_kwargs={'k': k, 'lambda_mult': self.lambda_mult})
 
         template = f"""你是一个吉林大学计算机科学技术学院信息帮助助手，你应当基于以下上下文回答问题，不得回答与上下文无关的问题:
         {{context}}
@@ -60,7 +60,7 @@ class LLMChat:
         return output
     
     def getDocs(self, query: str, k: int = 5):
-        docs = self.sqldao.searchWithRelevanceScores(query, k=k)
+        docs = self.sqldao.searchWithRelevanceScores(query, k=k, lambda_mult=self.lambda_mult)
         torch.cuda.empty_cache()
         return docs
         
