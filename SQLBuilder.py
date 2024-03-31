@@ -15,6 +15,6 @@ import interface
 # 获取数据并插入数据库
 def buildSQL():
     sql = SQLDAO(sqlConnection['url'], sqlConnection['user'], sqlConnection['password'])
-    sql.clearAll()
+    # sql.clearAll()
     interface.getData(sql.insertInfo)
 buildSQL()

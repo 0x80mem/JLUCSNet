@@ -33,7 +33,10 @@ class Chat:
         torch.cuda.empty_cache()
 
         try:
-            output = self.llm.getResponse(query)
+            try:
+                output = self.llm.getResponse(query)
+            except Exception as e:
+                output = self.llm.getResponse(query, k = 2)
         except Exception as e:
             torch.cuda.empty_cache()
             self.mutex.release()
