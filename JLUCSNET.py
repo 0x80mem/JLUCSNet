@@ -19,7 +19,7 @@ class Chat:
         try:
             docs = copy.deepcopy(self.llm.getDocs(query))
             for doc in docs:
-                doc[0].page_content = f"...{doc[0].page_content[len(doc[0].metadata['title']) + len(doc[0].metadata['date']) + 3:]}..."
+                doc[0].page_content = f"...{doc[0].page_content[len(doc[0].metadata['title']) + len(doc[0].metadata['date']) + 2:]}..."
         except Exception as e:
             torch.cuda.empty_cache()
             self.mutex.release()

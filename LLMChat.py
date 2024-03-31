@@ -27,6 +27,10 @@ class LLMChat:
         )
 
     def getResponse(self, query: str, k: int = 3):
+        docs = self.sqldao.searchWithRelevanceScores(query, k=k)
+        for doc in docs:
+            doc[0].page_content = doc[0].page_content[len(doc[0].metadata['title']) + len(doc[0].metadata['date']) + 2:]
+
         self.retriever = self.sqldao.vector_store.as_retriever(
             search_type="mmr", 
             search_kwargs={'k': k})
@@ -47,10 +51,13 @@ class LLMChat:
 
         output = self.chain.invoke(query)
         torch.cuda.empty_cache()
+
+        for doc in docs:
+            doc[0].page_content = f"{doc[0].metadata['title']} {doc[0].metadata['date']}:{doc[0].page_content}"
         return output
     
     def getDocs(self, query: str, k: int = 5):
-        docs = self.sqldao.searchWithRelevanceScores(query)
+        docs = self.sqldao.searchWithRelevanceScores(query, k=k)
         torch.cuda.empty_cache()
         return docs
         
